@@ -20,7 +20,7 @@ class SessionExtend
     public function __construct($settings = [])
     {
         				
-				$defaults = [
+	$defaults = [
             'lifetime'    => '10 second',
             'path'        => '/',
             'domain'      => null,
@@ -53,12 +53,11 @@ class SessionExtend
     public function __invoke(Request $request, Response $response, callable $next)
     {
         
-				$response = $next($request, $response);
-				
-				$this->extendSession();
-					
-				
-				return $response;
+	$response = $next($request, $response);
+	
+	$this->extendSession();
+	
+	return $response;
     }
 
     /**
