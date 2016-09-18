@@ -1,0 +1,34 @@
+{
+  "name": "ChimbiTheKing/slim3-extend-session",
+  "description": "Extend Session middleware for Slim framework 3.",
+  "type": "library",
+  "keywords": [
+    "slim",
+    "session",
+    "middleware",
+    "helper"
+  ],
+  "homepage": "https://github.com/ch1m81/slim3-extend-session",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "ch1m81",
+      "email": "ch1m81@gmail.com",
+      "homepage": "",
+      "role": ""
+    }
+  ],
+  "support": {
+    "source": "https://github.com/ch1m81/slim3-extend-session.git"
+  },
+  "require": {
+    "slim/slim": "^3.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "": "src/"
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}
