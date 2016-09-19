@@ -21,7 +21,7 @@ class SessionExtend
     {
         				
 	$defaults = [
-            'lifetime'    => '10 second',
+            'lifetime'    => '30 minutes',
             'path'        => '/',
             'domain'      => null,
             'secure'      => false,
@@ -29,11 +29,13 @@ class SessionExtend
             'name'        => 'supportfaq',
             'autorefresh' => true,
         ];
+        
         $settings = array_merge($defaults, $settings);
 
         if (is_string($lifetime = $settings['lifetime'])) {
             $settings['lifetime'] = strtotime($lifetime) - time();
         }
+        
         $this->settings = $settings;
 
         ini_set('session.gc_probability', 0);
@@ -52,23 +54,57 @@ class SessionExtend
      */
     public function __invoke(Request $request, Response $response, callable $next)
     {
-        
-	$response = $next($request, $response);
+				
+	$token = ($request->hasHeader('token')) ? $request->getHeaderLine('token') : false;			
+	$isValid = $this->isValidSessionID($token);
 	
-	$this->extendSession();
+	if ($isValid) {
+		
+		$response = $next($request, $response);				
+		
+		$this->extendSession();				
+
+	} else {
+		return $response->withStatus(403);
+	}
 	
 	return $response;
     }
 
     /**
-     * Start session
+     * Check if the user provided token matching session ID
+     */
+    protected function isValidSessionID($token)
+    {        
+					 
+	if (!$token && !isset($_SESSION['token'])) {
+		return false;
+	}
+	
+	if (empty(session_id())) {
+		$name = $this->settings['name'];
+		session_name($name);       
+		session_start();
+	}			
+	
+	
+	if (isset($_SESSION['token']) && $_SESSION['token'] && $_SESSION['token'] === $token) {					
+		return true;
+	}						
+	return false;
+    }
+		
+		
+		/**
+     * Extend session
      */
     protected function extendSession()
     {
-        $settings = $this->settings;
+								
+	$settings = $this->settings;
         $name = $settings['name'];
 
-        session_set_cookie_params(
+       session_set_cookie_params(
             $settings['lifetime'],
             $settings['path'],
             $settings['domain'],
@@ -76,9 +112,10 @@ class SessionExtend
             $settings['httponly']
         );
 
-        if (session_id()) {
-            if ($settings['autorefresh'] && isset($_COOKIE[$name])) {
-                setcookie(
+        if (session_id()) {            
+		if ($settings['autorefresh'] && isset($_COOKIE[$name])) {
+                								
+		setcookie(
                     $name,
                     $_COOKIE[$name],
                     time() + $settings['lifetime'],
@@ -87,11 +124,7 @@ class SessionExtend
                     $settings['secure'],
                     $settings['httponly']
                 );
-            }
+            }		
         }
-
-        session_name($name);
-        session_cache_limiter(false);
-        session_start();
     }
 }
