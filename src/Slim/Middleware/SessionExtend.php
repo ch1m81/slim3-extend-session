@@ -25,7 +25,7 @@ class SessionExtend
 				'domain'      => null,
 				'secure'      => false,
 				'httponly'    => false,
-				'name'        => 'supportfaq',
+				'name'        => 'xxx',
 				'autorefresh' => true,
 			];
         
